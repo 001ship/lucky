@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucky — 一键部署</title>
+<meta name="description" content="Lucky：any 出品的 LLM 多智能体自主安全测试平台。选一个方式，几分钟跑起来。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cg fill='%23171717'%3E%3Crect x='294' y='224' width='124' height='576' rx='34'/%3E%3Crect x='294' y='676' width='436' height='124' rx='34'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#fff; --fg:#0a0a0a; --muted:#737373; --line:#e5e5e5; --surface:#f5f5f5;
+    --primary:#171717; --primary-fg:#fafafa; --radius:.5rem;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#0a0a0a;--fg:#fafafa;--muted:#a1a1a1;--line:#262626;--surface:#171717;--primary:#fafafa;--primary-fg:#171717}
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.6;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 96px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .mark{width:38px;height:38px;flex:none}
+  h1{font-size:28px;margin:0;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0 0 40px;font-size:15px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:44px 0 14px;font-weight:600}
+  .card{
+    border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;
+    background:var(--bg);transition:border-color .15s;
+  }
+  .card:hover{border-color:var(--muted)}
+  .card h3{margin:0 0 4px;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card p{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .tag{font-size:11px;font-weight:600;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}
+  .tag.hot{background:var(--primary);color:var(--primary-fg);border-color:var(--primary)}
+  a.btn{
+    display:inline-block;background:var(--primary);color:var(--primary-fg);text-decoration:none;
+    padding:9px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;
+  }
+  a.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+  pre{
+    margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.55;
+  }
+  code{font-family:var(--mono);font-size:.92em}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  ol{padding-left:20px;color:var(--muted);font-size:14px}
+  ol strong{color:var(--fg)}
+  footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  footer a{color:var(--fg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true"><g fill="currentColor"><rect x="294" y="224" width="124" height="576" rx="34"/><rect x="294" y="676" width="436" height="124" rx="34"/></g></svg>
+    <h1>Lucky</h1>
+  </header>
+  <p class="sub">any 出品的 LLM 多智能体自主安全测试平台 · 选一种方式,几分钟跑起来</p>
+
+  <h2>一键部署</h2>
+
+  <div class="card">
+    <h3>Render <span class="tag hot">最快</span> <span class="tag">自动带 PostgreSQL</span></h3>
+    <p>点下面的按钮，Render 读取仓库里的 <code>render.yaml</code>，自动创建 Web 服务与托管数据库并注入连接串。</p>
+    <a class="btn" href="https://render.com/deploy?repo=https://github.com/001ship/lucky">Deploy to Render →</a>
+  </div>
+
+  <div class="card">
+    <h3>Linux / macOS <span class="tag">Docker</span></h3>
+    <p>一条命令：拉源码、随机化数据库密码、起容器、等就绪、打印初始化令牌。</p>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/001ship/lucky/main/install.sh | sh</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>Windows <span class="tag">PowerShell</span></h3>
+    <p>装了 Docker Desktop 用这条；已有 PostgreSQL 就在后面加 <code>-Native -PgHost … -PgPassword …</code>。</p>
+    <pre><code>irm https://raw.githubusercontent.com/001ship/lucky/main/install.ps1 | iex</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>容器镜像 <span class="tag">amd64 + arm64</span></h3>
+    <p>公开镜像，无需登录即可拉取。</p>
+    <pre><code>docker run -d --name lucky -p 8787:8787 \
+  -e ARTEX_PG_DSN='postgres://user:pass@host:5432/lucky?sslmode=disable' \
+  -v lucky-data:/app/data ghcr.io/001ship/lucky:latest</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>直接下载</h3>
+    <p>Linux / macOS / Windows 单二进制，前端已内嵌，解压即用。</p>
+    <div class="row">
+      <a class="btn ghost" href="https://github.com/001ship/lucky/releases/latest">打开 Releases →</a>
+      <a class="btn ghost" href="https://github.com/001ship/lucky">源码仓库</a>
+    </div>
+  </div>
+
+  <h2>部署之后</h2>
+  <ol>
+    <li>打开 <code>http://127.0.0.1:8787</code>（云平台用分配的域名）</li>
+    <li>首次进 <code>/setup</code>，用日志里的 <strong>Setup token</strong> 设置管理员密码</li>
+    <li>登录账号名固定为 <strong>Lucky</strong>，密码是你刚设的那个</li>
+    <li>到「系统配置 → LLM」填模型 Key，建第一个任务</li>
+  </ol>
+
+  <h2>接 Agent</h2>
+  <div class="card">
+    <h3>MCP 服务端 <span class="tag">11 个工具</span></h3>
+    <p>在「系统配置 → MCP」开启并创建访问令牌后，外部智能体可通过 Streamable HTTP 接入：建任务、查进度、读漏洞、补充提示。</p>
+    <pre><code>POST http://&lt;host&gt;:8787/mcp
+Authorization: Bearer artex_mcp_&lt;你的令牌&gt;</code></pre>
+  </div>
+
+  <footer>
+    Lucky 衍生自 <a href="https://github.com/RuoJi6/ARTEX">ARTEX</a>，以 <strong>AGPL-3.0</strong> 分发 · 仅可用于已获授权的资产测试 ·
+    界面与文档中的上游署名需保留
+  </footer>
+</div>
+</body>
+</html>

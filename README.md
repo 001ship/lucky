@@ -17,6 +17,15 @@
 
 ## 一键部署
 
+> 图形化部署页（点按钮即可）：**<https://001ship.github.io/lucky/>**
+>
+> [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/001ship/lucky)
+
+**Render（最快，自动创建 Web + PostgreSQL）**
+
+点上面的 Deploy to Render 按钮，Render 会读取仓库里的 `render.yaml`，建好服务与数据库并注入 `ARTEX_PG_DSN`。
+免费额度够试用；正式用建议 `starter` 及以上。
+
 **Linux / macOS（Docker）**
 
 ```bash

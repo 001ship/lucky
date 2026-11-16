@@ -1,0 +1,34 @@
+# Render 一键部署蓝图：https://render.com/deploy?repo=https://github.com/001ship/lucky
+# 读取本文件后自动创建：Web 服务（Docker 构建）+ 托管 PostgreSQL，并注入 ARTEX_PG_DSN。
+services:
+  - type: web
+    name: lucky
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: singapore
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: ARTEX_PG_DSN
+        fromDatabase:
+          name: lucky-db
+          property: connectionString
+      - key: TZ
+        value: Asia/Shanghai
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ARTEX_LLM_BASE_URL
+        sync: false
+      - key: ARTEX_LLM_MODEL
+        sync: false
+
+databases:
+  - name: lucky-db
+    plan: basic-256mb
+    region: singapore
+    databaseName: lucky
+    user: lucky

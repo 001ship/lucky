@@ -1,0 +1,14 @@
+{
+  "name": "Lucky",
+  "description": "any 出品的 LLM 多智能体自主安全测试平台",
+  "repository": "https://github.com/001ship/lucky",
+  "logo": "https://raw.githubusercontent.com/001ship/lucky/main/web/public/logo.png",
+  "keywords": ["security", "llm", "agents", "pentest"],
+  "stack": "container",
+  "addons": ["heroku-postgresql:essential-0"],
+  "env": {
+    "ARTEX_PG_DSN": { "description": "PostgreSQL 连接串", "required": true },
+    "OPENAI_API_KEY": { "description": "LLM API Key（也可启动后在界面里配）", "required": false },
+    "ANTHROPIC_API_KEY": { "description": "Anthropic API Key（可选）", "required": false }
+  }
+}
