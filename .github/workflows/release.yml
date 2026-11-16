@@ -1,0 +1,194 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号（不带 v）"
+        required: true
+        default: "1.0.0"
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ---------- 1) 前端静态产物 ----------
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install deps
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+      - name: Static export
+        working-directory: web
+        env:
+          NEXT_EXPORT: "1"
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build:static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webdist
+          path: web/out
+          retention-days: 3
+
+  # ---------- 2) 多平台二进制 ----------
+  binaries:
+    needs: web
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux,   goarch: amd64, ext: "" }
+          - { goos: linux,   goarch: arm64, ext: "" }
+          - { goos: windows, goarch: amd64, ext: ".exe" }
+          - { goos: darwin,  goarch: arm64, ext: "" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.10"
+          cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: webdist
+          path: server/webui/dist
+      - name: Version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build
+        env:
+          CGO_ENABLED: "0"
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          go build -tags embedui -trimpath \
+            -ldflags "-s -w -X main.version=${{ steps.v.outputs.value }}" \
+            -o "lucky${{ matrix.ext }}" ./cmd/artex
+      - name: Package
+        run: |
+          VER="${{ steps.v.outputs.value }}"
+          NAME="lucky-${VER}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          mkdir -p "pkg/$NAME"
+          cp "lucky${{ matrix.ext }}" "pkg/$NAME/"
+          cp -r skills "pkg/$NAME/"
+          cp config.example.json "pkg/$NAME/" 2>/dev/null || true
+          cp README.md "pkg/$NAME/" 2>/dev/null || true
+          cp LICENSE "pkg/$NAME/" 2>/dev/null || true
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            cp start.bat "pkg/$NAME/"
+          else
+            cp start.sh "pkg/$NAME/" && chmod +x "pkg/$NAME/start.sh"
+          fi
+          (cd pkg && zip -qr "../$NAME.zip" "$NAME")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pkg-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: "*.zip"
+          retention-days: 3
+
+  # ---------- 3) 发布 ----------
+  release:
+    needs: binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          pattern: pkg-*
+          merge-multiple: true
+      - name: Checksums
+        run: |
+          cd assets
+          sha256sum *.zip > SHA256SUMS
+          cat SHA256SUMS
+      - name: Version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Lucky v${{ steps.v.outputs.value }}
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', github.event.inputs.version) || github.ref_name }}
+          generate_release_notes: true
+          files: |
+            assets/*.zip
+            assets/SHA256SUMS
+          body: |
+            ## Lucky v${{ steps.v.outputs.value }}
+
+            ### 一键部署
+
+            ```bash
+            # Linux / macOS（Docker）
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | sh
+            ```
+
+            ```powershell
+            # Windows（PowerShell）
+            irm https://raw.githubusercontent.com/${{ github.repository }}/main/install.ps1 | iex
+            ```
+
+            ### 手动下载
+
+            下载对应平台的 zip，解压后：Windows 双击 `start.bat`；Linux/macOS 执行 `./start.sh`。
+            容器镜像：`ghcr.io/${{ github.repository }}:v${{ steps.v.outputs.value }}`
+
+  # ---------- 4) 容器镜像 ----------
+  image:
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: webdist
+          path: web/out
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            VERSION=${{ steps.v.outputs.value }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.v.outputs.value }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

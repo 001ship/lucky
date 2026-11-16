@@ -1,0 +1,28 @@
+# 依赖与构建产物
+web/node_modules/
+web/out/
+web/.next/
+server/webui/dist/
+dist/
+*.exe
+!.github/**/*.exe
+
+# 本地工具链 / 缓存
+.npm-cache/
+.smoke/
+shots/
+build-*.log
+*.dump
+
+# 本地运行数据
+data/
+.env
+*.log
+jwt.key
+config.json
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
