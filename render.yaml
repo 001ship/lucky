@@ -6,7 +6,8 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    plan: starter
+    # 先用免费档把服务跑起来；生产环境改成 starter 及以上
+    plan: free
     region: singapore
     healthCheckPath: /
     autoDeploy: true
@@ -28,7 +29,8 @@ services:
 
 databases:
   - name: lucky-db
-    plan: basic-256mb
+    # 免费库 30 天后过期，正式用请换 basic-256mb 及以上
+    plan: free
     region: singapore
     databaseName: lucky
     user: lucky
