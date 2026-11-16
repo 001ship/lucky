@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lucky 一键部署（Linux / macOS，Docker 方式）
 #
-#   curl -fsSL https://raw.githubusercontent.com/__GH_REPO__/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/001ship/lucky/main/install.sh | sh
 #
 # 可选环境变量：
 #   LUCKY_DIR     安装目录（默认 ./lucky）
@@ -10,7 +10,7 @@
 #   LUCKY_TAG     镜像 tag（配合 LUCKY_IMAGE，默认 latest）
 set -eu
 
-REPO="${LUCKY_REPO:-__GH_REPO__}"
+REPO="${LUCKY_REPO:-001ship/lucky}"
 DIR="${LUCKY_DIR:-./lucky}"
 PORT="${LUCKY_PORT:-8787}"
 IMAGE="${LUCKY_IMAGE:-}"

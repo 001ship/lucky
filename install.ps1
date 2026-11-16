@@ -4,7 +4,7 @@
 
 .DESCRIPTION
   Docker 方式（默认，推荐）：
-      irm https://raw.githubusercontent.com/__GH_REPO__/main/install.ps1 | iex
+      irm https://raw.githubusercontent.com/001ship/lucky/main/install.ps1 | iex
 
   原生方式（已有 PostgreSQL，直接跑单二进制）：
       .\install.ps1 -Native -PgHost 127.0.0.1 -PgPort 5432 -PgUser artex -PgPassword 'xxx'
@@ -18,7 +18,7 @@
 [CmdletBinding()]
 param(
   [switch]$Native,
-  [string]$Repo = "__GH_REPO__",
+  [string]$Repo = "001ship/lucky",
   [string]$Dir = "$env:LOCALAPPDATA\Lucky",
   [int]$Port = 8787,
   [string]$PgHost = "127.0.0.1",

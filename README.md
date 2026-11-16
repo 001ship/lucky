@@ -20,13 +20,13 @@
 **Linux / macOS（Docker）**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/__GH_REPO__/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/001ship/lucky/main/install.sh | sh
 ```
 
 **Windows（PowerShell，Docker Desktop）**
 
 ```powershell
-irm https://raw.githubusercontent.com/__GH_REPO__/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/001ship/lucky/main/install.ps1 | iex
 ```
 
 **Windows（原生，已有 PostgreSQL）**
@@ -41,11 +41,11 @@ irm https://raw.githubusercontent.com/__GH_REPO__/main/install.ps1 | iex
 ### Docker
 
 ```bash
-docker pull ghcr.io/__GH_REPO__:latest
+docker pull ghcr.io/001ship/lucky:latest
 docker run -d --name lucky -p 8787:8787 \
   -e ARTEX_PG_DSN='postgres://artex:pass@你的PG:5432/artex?sslmode=disable' \
   -v lucky-data:/app/data \
-  ghcr.io/__GH_REPO__:latest
+  ghcr.io/001ship/lucky:latest
 ```
 
 ### 手动下载
