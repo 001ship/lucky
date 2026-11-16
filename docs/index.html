@@ -107,6 +107,18 @@
     <li>到「系统配置 → LLM」填模型 Key，建第一个任务</li>
   </ol>
 
+  <h2>交给 AI 部署</h2>
+  <div class="card">
+    <h3>一句话模板 <span class="tag">copy &amp; paste</span></h3>
+    <p>把目标机器、部署形态、数据库、LLM Key、验收标准一次性发给 AI，它就能自主完成。<a href="https://github.com/001ship/lucky/blob/main/docs/AI-DEPLOY.md">完整清单 →</a></p>
+    <pre><code>帮我部署 Lucky（https://github.com/001ship/lucky）：
+本机 Windows，已有 PostgreSQL 于 127.0.0.1:5433（库 artex / 用户 artex），已装 Docker Desktop。
+部署形态：原生单二进制到 C:\app\lucky，端口 8787。
+LLM：provider=openai，model=gpt-4o，key=sk-...
+验收：/login/ 返回 200；用日志 Setup token 设好管理员密码；对靶场起一个任务并跑出至少 1 条 finding。
+约束：数据库改动前 pg_dump；保留旧版本可回滚。</code></pre>
+  </div>
+
   <h2>接 Agent</h2>
   <div class="card">
     <h3>MCP 服务端 <span class="tag">11 个工具</span></h3>
