@@ -10,6 +10,7 @@ dist/
 # 本地工具链 / 缓存
 .npm-cache/
 .smoke/
+.verify/
 shots/
 build-*.log
 *.dump
