@@ -165,7 +165,7 @@ jobs:
 
   # ---------- 4) 容器镜像 ----------
   image:
-    needs: web
+    needs: binaries
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
